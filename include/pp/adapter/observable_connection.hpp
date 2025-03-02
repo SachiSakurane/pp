@@ -22,15 +22,13 @@ namespace detail {
   };
 
   template <observable O, connectable_observable_to_function<O> F>
-  class observable_connection {
+  class observable_connection_r {
   public:
     using value_type = connection_observable_traits<O, F>::invoke_result_type;
 
     class subscription_impl : public subscription<typename O::value_type>,
                               public connection_observable_traits<O, F>::observer_type {
     public:
-      constexpr subscription_impl() {}
-
       constexpr subscription_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {}
 
       value_type observe() const override { return func(obs->get().observe()); }
@@ -43,7 +41,7 @@ namespace detail {
       const F func;
     };
 
-    constexpr observable_connection(O &o, F &&f)
+    constexpr observable_connection_r(O &o, F &&f)
         : sub{std::make_shared<subscription_impl>(o, std::forward<F>(f))} {
       o.subscribe(sub);
     }
@@ -60,15 +58,13 @@ namespace detail {
   };
 
   template <observable O, connectable_observable_to_function<O> F>
-  class observable_connection_r {
+  class observable_connection {
   public:
     using value_type = connection_observable_traits<O, F>::invoke_result_type;
 
     class subscription_impl : public subscription<typename O::value_type>,
                               public connection_observable_traits<O, F>::observer_type {
     public:
-      constexpr subscription_impl() {}
-
       constexpr subscription_impl(O &&o, F &&f)
           : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {}
 
@@ -84,7 +80,7 @@ namespace detail {
       const F func;
     };
 
-    constexpr observable_connection_r(O &&o, F &&f)
+    constexpr observable_connection(O &&o, F &&f)
         : sub{std::make_shared<subscription_impl>(std::forward<O>(o), std::forward<F>(f))} {
       sub->get_observer()->subscribe(sub);
     }
@@ -104,11 +100,11 @@ namespace detail {
 
 template <observable O, detail::connectable_observable_to_function<O> F>
 [[nodiscard]] inline auto operator|(O &o, F &&f) {
-  return detail::observable_connection<O, F>{o, std::forward<F>(f)};
+  return detail::observable_connection_r<O, F>{o, std::forward<F>(f)};
 }
 
 template <observable O, detail::connectable_observable_to_function<O> F>
 [[nodiscard]] inline auto operator|(O &&o, F &&f) {
-  return detail::observable_connection_r<O, F>{std::forward<O>(o), std::forward<F>(f)};
+  return detail::observable_connection<O, F>{std::forward<O>(o), std::forward<F>(f)};
 }
 } // namespace pp

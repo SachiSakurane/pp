@@ -7,6 +7,7 @@ template <std::copy_constructible Type, observable ObserverType = pp::observer<T
 class behavior : public ObserverType {
 public:
   using value_type = ObserverType::value_type;
+  using subscription_type = pp::subscription<value_type>;
 
   behavior(value_type initial_value) : current_value{initial_value} {}
 
@@ -29,6 +30,8 @@ public:
 
   operator value_type() const { return current_value; }
   value_type observe() const override { return current_value; }
+
+  void subscribe(std::weak_ptr<subscription_type> s) override { ObserverType::subscribe(s); }
 
 private:
   value_type current_value;

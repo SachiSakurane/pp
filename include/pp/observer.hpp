@@ -11,7 +11,7 @@ template <std::copy_constructible Type>
 class observer {
 public:
   using value_type = Type;
-  using subscription_type = pp::subscription<Type>;
+  using subscription_type = pp::subscription<value_type>;
 
   virtual ~observer() = default;
 
@@ -26,7 +26,6 @@ public:
 
   virtual void notify(value_type v) {
     fetch();
-
     for (auto s : subscriptions) {
       if (auto l = s.lock(); l) {
         l->receive(v);

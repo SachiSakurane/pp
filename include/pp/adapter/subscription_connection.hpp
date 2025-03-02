@@ -26,7 +26,6 @@ namespace detail {
 
     class subscription_impl : public connection_subscription_traits<O, F>::subscription_type {
     public:
-      constexpr subscription_impl() {}
       constexpr subscription_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {}
 
       std::optional<std::reference_wrapper<O>> get_observable() { return obs; }
