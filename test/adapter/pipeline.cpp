@@ -42,7 +42,7 @@ terminus: 30<-string
 )");
 }
 
-TEST(PipelineTest, HotPipelineOne) {
+TEST(PipelineTest, HotPipelineSingle) {
   pp::behavior<int> x{2};
 
   testing::internal::CaptureStdout();
@@ -88,7 +88,6 @@ double: 79.8
 
 TEST(PipelineTest, HotPipelineMultiple) {
   pp::behavior<int> x{8};
-
 
   testing::internal::CaptureStdout();
   std::cout << std::endl;
