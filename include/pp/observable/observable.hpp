@@ -8,7 +8,7 @@
 
 namespace pp::observable {
 template <std::copy_constructible Type, std::copy_constructible ObserverType = Type>
-class cold_observable {
+class observable {
 public:
   using value_type = Type;
   using observer_value_type = ObserverType;
@@ -16,7 +16,7 @@ public:
   using subscription_type = std::shared_ptr<observer_type>;
   using observable_type = pp::observable::cold;
 
-  virtual ~cold_observable() = default;
+  virtual ~observable() = default;
 
   virtual void next(const value_type &v) = 0;
   virtual void next(value_type &&v) = 0;

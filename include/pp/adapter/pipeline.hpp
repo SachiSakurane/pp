@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <pp/concepts/observable.hpp>
-#include <pp/observable/cold_observable.hpp>
+#include <pp/observable/observable.hpp>
 #include <pp/observable/hot_observable.hpp>
 
 namespace pp {
@@ -72,7 +72,7 @@ namespace detail {
     using subscription_type = std::shared_ptr<observer_type>;
     using observable_type = pp::observable::cold;
 
-    using _impl_type = pp::observable::cold_observable<value_type, observer_value_type>;
+    using _impl_type = pp::observable::observable<value_type, observer_value_type>;
 
     class pipeline_r_impl : public _impl_type {
     public:
@@ -154,7 +154,7 @@ namespace detail {
     using subscription_type = std::shared_ptr<observer_type>;
     using observable_type = pp::observable::cold;
 
-    using _impl_type = pp::observable::cold_observable<value_type, observer_value_type>;
+    using _impl_type = pp::observable::observable<value_type, observer_value_type>;
 
     class pipeline_impl : public _impl_type {
     public:
