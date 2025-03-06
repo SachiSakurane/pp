@@ -2,12 +2,11 @@
 
 #include <vector>
 
-#include <pp/observable/type.hpp>
-#include <pp/observer.hpp>
+#include <pp/observable/hot_observable.hpp>
 
 namespace pp {
 template <std::copy_constructible Type>
-class behavior {
+class behavior : public pp::observable::hot_observable<Type> {
 public:
   using value_type = Type;
   using observer_value_type = value_type;
@@ -34,40 +33,19 @@ public:
   }
 
   operator observer_value_type() const { return current_value; }
-  observer_value_type get() const { return current_value; }
+  observer_value_type get() const override { return current_value; }
 
-  void next(const value_type &v) {
+  void next(const value_type &v) override {
     current_value = v;
-    notify(current_value);
+    pp::observable::hot_observable<Type>::notify(current_value);
   }
 
-  void next(value_type &&v) {
+  void next(value_type &&v) override {
     current_value = std::move(v);
-    notify(current_value);
-  }
-
-  subscription_type subscribe(observer_type &&o) {
-    auto subscription = std::make_shared<observer_type>(std::move(o));
-    auto &oo = observers.emplace_back(subscription);
-    if (auto l = oo.lock(); l) {
-      (*l)(current_value);
-    }
-    return subscription;
-  }
-
-  void notify(const observer_value_type &v) {
-    observers.erase(std::remove_if(std::begin(observers), std::end(observers),
-                                   [](auto s) { return s.expired(); }),
-                    std::end(observers));
-    for (auto o : observers) {
-      if (auto l = o.lock(); l) {
-        (*l)(v);
-      }
-    }
+    pp::observable::hot_observable<Type>::notify(current_value);
   }
 
 private:
   value_type current_value;
-  std::vector<std::weak_ptr<observer_type>> observers;
 };
 } // namespace pp
