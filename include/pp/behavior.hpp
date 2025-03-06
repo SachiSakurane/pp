@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include <pp/observable/hot_observable.hpp>
 
 namespace pp {
