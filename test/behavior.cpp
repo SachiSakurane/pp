@@ -27,3 +27,19 @@ TEST(BehaviorTest, Next) {
   i = 32;
   ASSERT_EQ(i, 32);
 }
+
+TEST(BehaviorTest, Subscribe) {
+  pp::behavior<int> i{42};
+
+  testing::internal::CaptureStdout();
+  std::cout << std::endl;
+
+  auto s = i.subscribe([](auto i) { std::cout << "int: " << i << std::endl; });
+  i = 100;
+  std::string log = testing::internal::GetCapturedStdout();
+
+  ASSERT_EQ(static_cast<std::string>(log), R"(
+int: 42
+int: 100
+)");
+}

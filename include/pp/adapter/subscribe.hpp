@@ -9,73 +9,69 @@ namespace detail {
       pp::concepts::observable<O> && std::is_invocable_v<F, typename O::observer_value_type> &&
       std::is_same_v<std::invoke_result_t<F, typename O::observer_value_type>, void>;
 
-  template <pp::concepts::hot_observable O, subscribable_pipeline_function<O> F>
+  template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
   struct subscribable_pipeline_traits {
     using value_type = typename O::value_type;
     using observer_value_type = typename O::observer_value_type;
   };
 
-  template <pp::concepts::hot_observable O, subscribable_pipeline_function<O> F>
-  class hot_subscribe_r {
+  template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
+  class subscribe_r {
   public:
     using observer_value_type = subscribable_pipeline_traits<O, F>::observer_value_type;
 
-    class hot_subscribe_r_impl {
+    class subscribe_r_impl {
     public:
-      hot_subscribe_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {}
-
-      void f(const observer_value_type &v) { func(v); }
-      auto &get_observable() { return obs->get(); }
+      subscribe_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
+        subscription = obs->get().subscribe([&](auto v) { func(v); });
+      }
 
     private:
+      O::subscription_type subscription;
       std::optional<std::reference_wrapper<O>> obs;
       const F func;
     };
 
-    constexpr hot_subscribe_r(O &o, F &&f)
-        : impl{std::make_unique<hot_subscribe_r_impl>(o, std::forward<F>(f))},
-          subscription{impl->get_observable().subscribe([&](auto v) { impl->f(v); })} {}
+    constexpr subscribe_r(O &o, F &&f)
+        : impl{std::make_unique<subscribe_r_impl>(o, std::forward<F>(f))} {}
 
   private:
-    std::unique_ptr<hot_subscribe_r_impl> impl;
-    O::subscription_type subscription;
+    std::unique_ptr<subscribe_r_impl> impl;
   };
 
-  template <pp::concepts::hot_observable O, subscribable_pipeline_function<O> F>
-  class hot_subscribe {
+  template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
+  class subscribe {
   public:
     using observer_value_type = subscribable_pipeline_traits<O, F>::observer_value_type;
 
-    class hot_subscribe_impl {
+    class subscribe_impl {
     public:
-      hot_subscribe_impl(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {}
-
-      void f(const observer_value_type &v) { func(v); }
-      auto &get_observable() { return *obs; }
+      subscribe_impl(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {
+        subscription = obs->subscribe([&](auto v) { func(v); });
+      }
 
     private:
+      O::subscription_type subscription;
       std::optional<O> obs;
       const F func;
     };
 
-    constexpr hot_subscribe(O &&o, F &&f)
-        : impl{std::make_unique<hot_subscribe_impl>(std::forward<O>(o), std::forward<F>(f))},
-          subscription{impl->get_observable().subscribe([&](auto v) { impl->f(v); })} {}
+    constexpr subscribe(O &&o, F &&f)
+        : impl{std::make_unique<subscribe_impl>(std::forward<O>(o), std::forward<F>(f))} {}
 
   private:
-    std::unique_ptr<hot_subscribe_impl> impl;
-    O::subscription_type subscription;
+    std::unique_ptr<subscribe_impl> impl;
   };
 
 } // namespace detail
 
-template <pp::concepts::hot_observable O, detail::subscribable_pipeline_function<O> F>
+template <pp::concepts::observable O, detail::subscribable_pipeline_function<O> F>
 [[nodiscard]] inline auto operator|(O &o, F &&f) {
-  return detail::hot_subscribe_r<O, F>{o, std::forward<F>(f)};
+  return detail::subscribe_r<O, F>{o, std::forward<F>(f)};
 }
 
-template <pp::concepts::hot_observable O, detail::subscribable_pipeline_function<O> F>
+template <pp::concepts::observable O, detail::subscribable_pipeline_function<O> F>
 [[nodiscard]] inline auto operator|(O &&o, F &&f) {
-  return detail::hot_subscribe<O, F>{std::forward<O>(o), std::forward<F>(f)};
+  return detail::subscribe<O, F>{std::forward<O>(o), std::forward<F>(f)};
 }
 } // namespace pp

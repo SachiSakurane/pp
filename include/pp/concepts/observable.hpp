@@ -10,8 +10,10 @@ namespace pp::concepts {
 template <class ObservableType>
 concept observable = std::copy_constructible<typename ObservableType::value_type> &&
                      requires(ObservableType o, typename ObservableType::observer_type &&obs,
-                              typename ObservableType::value_type v) {
+                              typename ObservableType::value_type v,
+                              const typename ObservableType::observer_value_type &ov) {
                        o.next(v);
+                       o.notify(ov);
                        {
                          o.subscribe(std::move(obs))
                        } -> std::convertible_to<typename ObservableType::subscription_type>;
@@ -21,9 +23,7 @@ template <class ObservableType>
 concept hot_observable =
     observable<ObservableType> &&
     std::is_same_v<typename ObservableType::observable_type, pp::observable::hot> &&
-    requires(ObservableType o, const ObservableType co,
-             const typename ObservableType::observer_value_type &v) {
-      o.notify(v);
+    requires(ObservableType o, const ObservableType co) {
       { co.get() } -> std::convertible_to<typename ObservableType::observer_value_type>;
     };
 
