@@ -4,7 +4,7 @@
 
 #include <pp/adapter/pipeline.hpp>
 #include <pp/adapter/subscribe.hpp>
-#include <pp/behavior.hpp>
+#include <pp/subject/behavior.hpp>
 
 TEST(AdapterSubscribeTest, HotSubscribe) {
   pp::behavior<int> x{1};

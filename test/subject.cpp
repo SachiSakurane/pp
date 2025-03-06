@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <pp/subject.hpp>
+#include <pp/subject/subject.hpp>
 
 TEST(SubjectTest, Construction) {
   struct ClassA {

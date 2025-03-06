@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
+#include <pp/subject/behavior.hpp>
+#include <pp/subject/subject.hpp>
 #include <pp/adapter.hpp>
-#include <pp/behavior.hpp>
-#include <pp/subject.hpp>
 
 TEST(PipelineTest, HotPipeline) {
   pp::behavior<int> x{1};
