@@ -18,49 +18,27 @@ namespace detail {
   template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
   class subscribe_r {
   public:
-    using observer_value_type = subscribable_pipeline_traits<O, F>::observer_value_type;
-
-    class subscribe_r_impl {
-    public:
-      subscribe_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
-        subscription = obs->get().subscribe([&](const auto &v) { func(v); });
-      }
-
-    private:
-      O::subscription_type subscription;
-      std::optional<std::reference_wrapper<O>> obs;
-      const F func;
-    };
-
-    constexpr subscribe_r(O &o, F &&f)
-        : impl{std::make_unique<subscribe_r_impl>(o, std::forward<F>(f))} {}
+    constexpr subscribe_r(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
+      subscription = obs->get().subscribe([&](const auto &v) { func(v); });
+    }
 
   private:
-    std::unique_ptr<subscribe_r_impl> impl;
+    O::subscription_type subscription;
+    std::optional<std::reference_wrapper<O>> obs;
+    const F func;
   };
 
   template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
   class subscribe {
   public:
-    using observer_value_type = subscribable_pipeline_traits<O, F>::observer_value_type;
-
-    class subscribe_impl {
-    public:
-      subscribe_impl(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {
-        subscription = obs->subscribe([&](const auto &v) { func(v); });
-      }
-
-    private:
-      O::subscription_type subscription;
-      std::optional<O> obs;
-      const F func;
-    };
-
-    constexpr subscribe(O &&o, F &&f)
-        : impl{std::make_unique<subscribe_impl>(std::forward<O>(o), std::forward<F>(f))} {}
+    constexpr subscribe(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {
+      subscription = obs->subscribe([&](const auto &v) { func(v); });
+    }
 
   private:
-    std::unique_ptr<subscribe_impl> impl;
+    O::subscription_type subscription;
+    std::optional<O> obs;
+    const F func;
   };
 
 } // namespace detail
