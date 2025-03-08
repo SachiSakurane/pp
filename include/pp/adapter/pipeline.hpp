@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include <pp/concepts/observable.hpp>
-#include <pp/observable/observable.hpp>
 #include <pp/observable/hot_observable.hpp>
+#include <pp/observable/observable.hpp>
 
 namespace pp {
 namespace detail {
@@ -37,7 +37,7 @@ namespace detail {
     class pipeline_r_impl : public _impl_type {
     public:
       pipeline_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
-        subscription = obs->get().subscribe([&](auto v) { _impl_type::notify(func(v)); });
+        subscription = obs->get().subscribe([&](const auto &v) { _impl_type::notify(func(v)); });
       }
 
       observer_value_type get() const override { return func(obs->get().get()); }
@@ -77,7 +77,7 @@ namespace detail {
     class pipeline_r_impl : public _impl_type {
     public:
       pipeline_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
-        subscription = obs->get().subscribe([&](auto v) { _impl_type::notify(func(v)); });
+        subscription = obs->get().subscribe([&](const auto &v) { _impl_type::notify(func(v)); });
       }
 
       void next(const value_type &v) override { obs->get().next(v); }

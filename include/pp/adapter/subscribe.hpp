@@ -23,7 +23,7 @@ namespace detail {
     class subscribe_r_impl {
     public:
       subscribe_r_impl(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
-        subscription = obs->get().subscribe([&](auto v) { func(v); });
+        subscription = obs->get().subscribe([&](const auto &v) { func(v); });
       }
 
     private:
@@ -47,7 +47,7 @@ namespace detail {
     class subscribe_impl {
     public:
       subscribe_impl(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {
-        subscription = obs->subscribe([&](auto v) { func(v); });
+        subscription = obs->subscribe([&](const auto &v) { func(v); });
       }
 
     private:
