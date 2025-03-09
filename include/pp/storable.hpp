@@ -1,5 +1,5 @@
 #pragma once
 
 namespace pp {
-class store {};
+struct storable {};
 } // namespace pp

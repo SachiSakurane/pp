@@ -3,14 +3,14 @@
 #include <any>
 #include <vector>
 
-#include <pp/concepts/stoable.hpp>
+#include <pp/concepts/storable.hpp>
 
 namespace pp {
 class storage {
 public:
-  storage() {}
+  storage() = default;
 
-  storage &operator+=(pp::stoable auto &&s) {
+  storage &operator+=(pp::concepts::storable auto &&s) {
     this->store.emplace_back(std::move(s));
     return *this;
   }
