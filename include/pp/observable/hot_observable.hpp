@@ -1,10 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <pp/observable/type.hpp>
 #include <pp/observer.hpp>
+#include <pp/subscription.hpp>
 
 namespace pp::observable {
 template <std::copy_constructible Type, std::copy_constructible ObserverType = Type>
@@ -13,7 +11,7 @@ public:
   using value_type = Type;
   using observer_value_type = ObserverType;
   using observer_type = pp::observer<observer_value_type>;
-  using subscription_type = std::shared_ptr<observer_type>;
+  using subscription_type = pp::subscription<value_type, observer_type>;
   using observable_type = pp::observable::hot;
 
   virtual ~hot_observable() = default;
@@ -23,8 +21,8 @@ public:
   virtual void next(value_type &&v) = 0;
 
   virtual subscription_type subscribe(observer_type &&o) {
-    auto subscription = std::make_shared<observer_type>(std::move(o));
-    auto &oo = observers.emplace_back(subscription);
+    auto subscription = subscription_type{std::forward<observer_type>(o)};
+    auto &oo = observers.emplace_back(subscription.get_weak());
     if (auto l = oo.lock(); l) {
       (*l)(get());
     }
@@ -43,6 +41,6 @@ public:
   }
 
 protected:
-  std::vector<std::weak_ptr<observer_type>> observers;
+  subscription_type::observers_type observers;
 };
 } // namespace pp::observable

@@ -7,6 +7,7 @@
 #include <pp/adapter.hpp>
 #include <pp/subject/behavior.hpp>
 #include <pp/subject/subject.hpp>
+#include <pp/storage.hpp>
 
 using namespace pp;
 
@@ -22,8 +23,10 @@ TEST(AdapterToObservableTest, HotSubscribe) {
 
   std::cout << "---" << std::endl;
 
-  auto s = *o | [](auto s) { std::cout << "sub1: " << s << std::endl; };
-  auto ss = *o | [](auto s) { std::cout << "sub2: " << s << std::endl; };
+  pp::storage s;
+
+  s += *o | [](auto s) { std::cout << "sub1: " << s << std::endl; };
+  s += *o | [](auto s) { std::cout << "sub2: " << s << std::endl; };
 
   std::cout << "---" << std::endl;
 

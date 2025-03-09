@@ -9,7 +9,7 @@ public:
   using value_type = Type;
   using observer_value_type = value_type;
   using observer_type = pp::observer<observer_value_type>;
-  using subscription_type = std::shared_ptr<observer_type>;
+  using subscription_type = pp::subscription<value_type, observer_type>;
   using observable_type = pp::observable::cold;
 
   subject() = default;

@@ -16,7 +16,7 @@ namespace detail {
   };
 
   template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
-  class subscribe_r {
+  class subscribe_r : public pp::storable {
   public:
     constexpr subscribe_r(O &o, F &&f) : obs{o}, func{std::forward<F>(f)} {
       subscription = obs->get().subscribe([&](const auto &v) { func(v); });
@@ -29,7 +29,7 @@ namespace detail {
   };
 
   template <pp::concepts::observable O, subscribable_pipeline_function<O> F>
-  class subscribe {
+  class subscribe : public pp::storable {
   public:
     constexpr subscribe(O &&o, F &&f) : obs{std::forward<O>(o)}, func{std::forward<F>(f)} {
       subscription = obs->subscribe([&](const auto &v) { func(v); });

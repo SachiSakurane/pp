@@ -29,7 +29,7 @@ namespace detail {
     using value_type = connectable_pipeline_traits<O, F>::value_type;
     using observer_value_type = connectable_pipeline_traits<O, F>::invoke_result_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::hot;
 
     using _impl_type = pp::observable::hot_observable<value_type, observer_value_type>;
@@ -51,7 +51,7 @@ namespace detail {
     };
 
     constexpr pipeline_r(O &o, F &&f)
-        : impl{std::make_shared<pipeline_r_impl>(o, std::forward<F>(f))} {}
+        : impl{std::make_unique<pipeline_r_impl>(o, std::forward<F>(f))} {}
 
     observer_value_type get() const { return impl->get(); }
     void next(const value_type &v) { impl->next(v); }
@@ -60,7 +60,7 @@ namespace detail {
     void notify(const observer_value_type &v) { impl->notify(v); }
 
   private:
-    std::shared_ptr<pipeline_r_impl> impl;
+    std::unique_ptr<pipeline_r_impl> impl;
   };
 
   template <pp::concepts::cold_observable O, connectable_pipeline_function<O> F>
@@ -69,7 +69,7 @@ namespace detail {
     using value_type = connectable_pipeline_traits<O, F>::value_type;
     using observer_value_type = connectable_pipeline_traits<O, F>::invoke_result_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::cold;
 
     using _impl_type = pp::observable::observable<value_type, observer_value_type>;
@@ -90,7 +90,7 @@ namespace detail {
     };
 
     constexpr pipeline_r(O &o, F &&f)
-        : impl{std::make_shared<pipeline_r_impl>(o, std::forward<F>(f))} {}
+        : impl{std::make_unique<pipeline_r_impl>(o, std::forward<F>(f))} {}
 
     void next(const value_type &v) { impl->next(v); }
     void next(value_type &&v) { impl->next(std::move(v)); }
@@ -98,7 +98,7 @@ namespace detail {
     void notify(const observer_value_type &v) { impl->notify(v); }
 
   private:
-    std::shared_ptr<pipeline_r_impl> impl;
+    std::unique_ptr<pipeline_r_impl> impl;
   };
 
   template <class O, class F>
@@ -110,7 +110,7 @@ namespace detail {
     using value_type = connectable_pipeline_traits<O, F>::value_type;
     using observer_value_type = connectable_pipeline_traits<O, F>::invoke_result_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::hot;
 
     using _impl_type = pp::observable::hot_observable<value_type, observer_value_type>;
@@ -133,7 +133,7 @@ namespace detail {
     };
 
     constexpr pipeline(O &&o, F &&f)
-        : impl{std::make_shared<pipeline_impl>(std::forward<O>(o), std::forward<F>(f))} {}
+        : impl{std::make_unique<pipeline_impl>(std::forward<O>(o), std::forward<F>(f))} {}
 
     observer_value_type get() const { return impl->get(); }
     void next(const value_type &v) { impl->next(v); }
@@ -142,7 +142,7 @@ namespace detail {
     void notify(const observer_value_type &v) { impl->notify(v); }
 
   private:
-    std::shared_ptr<pipeline_impl> impl;
+    std::unique_ptr<pipeline_impl> impl;
   };
 
   template <pp::concepts::cold_observable O, connectable_pipeline_function<O> F>
@@ -151,7 +151,7 @@ namespace detail {
     using value_type = connectable_pipeline_traits<O, F>::value_type;
     using observer_value_type = connectable_pipeline_traits<O, F>::invoke_result_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::cold;
 
     using _impl_type = pp::observable::observable<value_type, observer_value_type>;
@@ -173,7 +173,7 @@ namespace detail {
     };
 
     constexpr pipeline(O &&o, F &&f)
-        : impl{std::make_shared<pipeline_impl>(std::forward<O>(o), std::forward<F>(f))} {}
+        : impl{std::make_unique<pipeline_impl>(std::forward<O>(o), std::forward<F>(f))} {}
 
     void next(const value_type &v) { impl->next(v); }
     void next(value_type &&v) { impl->next(std::move(v)); }
@@ -181,7 +181,7 @@ namespace detail {
     void notify(const observer_value_type &v) { impl->notify(v); }
 
   private:
-    std::shared_ptr<pipeline_impl> impl;
+    std::unique_ptr<pipeline_impl> impl;
   };
 } // namespace detail
 

@@ -17,7 +17,7 @@ namespace detail {
     using value_type = typename O::value_type;
     using observer_value_type = typename O::observer_value_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::hot;
 
     hot_observable_wrapper_r(O &o) : obs{o} {
@@ -44,7 +44,7 @@ namespace detail {
     using value_type = typename O::value_type;
     using observer_value_type = typename O::observer_value_type;
     using observer_type = pp::observer<observer_value_type>;
-    using subscription_type = std::shared_ptr<observer_type>;
+    using subscription_type = pp::subscription<value_type, observer_type>;
     using observable_type = pp::observable::hot;
 
     hot_observable_wrapper(O &&o) : obs{std::move(o)} {
