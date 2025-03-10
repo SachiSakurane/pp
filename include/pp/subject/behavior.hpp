@@ -12,10 +12,12 @@ public:
   using subscription_type = pp::subscription<value_type, observer_type>;
   using observable_type = pp::observable::hot;
 
-  behavior(value_type initial_value) : current_value{initial_value} {}
+  behavior(value_type initial_value) { current_value.emplace(initial_value); }
 
   template <class... Args>
-  behavior(Args &&...args) : current_value{std::forward<Args>(args)...} {}
+  behavior(Args &&...args) {
+    current_value.emplace(std::forward<Args>(args)...);
+  }
 
   behavior(const behavior &) = default;
   behavior(behavior &&) = default;
@@ -30,20 +32,20 @@ public:
     return *this;
   }
 
-  operator observer_value_type() const { return current_value; }
-  observer_value_type get() const override { return current_value; }
+  operator observer_value_type() const { return current_value.value(); }
+  observer_value_type get() const override { return current_value.value(); }
 
   void next(const value_type &v) override {
-    current_value = v;
-    pp::observable::hot_observable<Type>::notify(current_value);
+    current_value.emplace(v);
+    pp::observable::hot_observable<Type>::notify(current_value.value());
   }
 
   void next(value_type &&v) override {
-    current_value = std::move(v);
-    pp::observable::hot_observable<Type>::notify(current_value);
+    current_value.emplace(std::move(v));
+    pp::observable::hot_observable<Type>::notify(current_value.value());
   }
 
 private:
-  value_type current_value;
+  std::optional<value_type> current_value;
 };
 } // namespace pp
