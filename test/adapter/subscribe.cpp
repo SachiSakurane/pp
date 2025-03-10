@@ -5,6 +5,7 @@
 #include <pp/adapter/pipeline.hpp>
 #include <pp/adapter/subscribe.hpp>
 #include <pp/subject/behavior.hpp>
+#include <pp/subject/subject.hpp>
 
 TEST(AdapterSubscribeTest, HotSubscribe) {
   pp::behavior<int> x{1};
@@ -86,5 +87,19 @@ double: 37.12
 ---
 int: 19
 double: 88.16
+)");
+}
+
+TEST(AdapterSubscribeTest, ColdSubscribe) {
+  pp::subject<int> x;
+
+  testing::internal::CaptureStdout();
+  std::cout << std::endl;
+  auto o = x | [](auto i) { std::cout << "wa: " << i << std::endl; };
+  x = 42;
+  std::string log = testing::internal::GetCapturedStdout();
+
+  ASSERT_EQ(static_cast<std::string>(log), R"(
+wa: 42
 )");
 }
