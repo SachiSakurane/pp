@@ -3,7 +3,7 @@ cc_test(
     size = "small",
     srcs = glob(["**/*.cpp"]),
     deps = [
-        "//:pp_test_library",
+        "//:pp_library",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
